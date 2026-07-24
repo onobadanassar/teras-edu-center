@@ -1,5 +1,13 @@
+// ===== github-sync.js =====
+// دوال المزامنة مع GitHub
+
+// ===== حفظ البيانات إلى GitHub =====
 async function syncToGitHub() {
   try {
+    // استخدام db من النافذة (window)
+    const db = window.db || {};
+    
+    // جمع كل البيانات
     const data = {
       employees: db.employees || [],
       students: db.students || [],
@@ -18,6 +26,7 @@ async function syncToGitHub() {
     
     const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.file}`;
     
+    // التحقق من وجود الملف
     let sha = '';
     const getResponse = await fetch(url, {
       headers: {
@@ -31,8 +40,10 @@ async function syncToGitHub() {
       sha = existing.sha;
     }
     
+    // تشفير البيانات
     const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
     
+    // حفظ البيانات
     const response = await fetch(url, {
       method: 'PUT',
       headers: {
@@ -50,7 +61,8 @@ async function syncToGitHub() {
     if (response.ok) {
       toast('✅ تم حفظ البيانات في GitHub');
     } else {
-      toast('❌ فشل الحفظ');
+      const error = await response.json();
+      toast('❌ فشل الحفظ: ' + (error.message || 'خطأ غير معروف'));
     }
   } catch (error) {
     console.error(error);
@@ -58,6 +70,7 @@ async function syncToGitHub() {
   }
 }
 
+// ===== تحميل البيانات من GitHub =====
 async function loadFromGitHub() {
   try {
     const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.file}`;
@@ -70,7 +83,7 @@ async function loadFromGitHub() {
     
     if (!response.ok) {
       if (response.status === 404) {
-        toast('⚠️ لا يوجد ملف بيانات في GitHub');
+        toast('⚠️ لا يوجد ملف بيانات في GitHub. احفظ البيانات أولاً!');
         return;
       }
       throw new Error('فشل التحميل');
@@ -79,6 +92,8 @@ async function loadFromGitHub() {
     const data = await response.json();
     const content = JSON.parse(atob(data.content));
     
+    // استعادة البيانات
+    const db = window.db || {};
     db.employees = content.employees || [];
     db.students = content.students || [];
     db.payments = content.payments || [];
@@ -93,19 +108,34 @@ async function loadFromGitHub() {
     db.pricePlans = content.pricePlans || [];
     if (content.settings) db.settings = content.settings;
     
-    saveDB();
-    refreshAllData();
+    // حفظ في LocalStorage
+    if (typeof saveDB === 'function') {
+      saveDB();
+    } else {
+      localStorage.setItem('terasUnifiedDB_v5', JSON.stringify(db));
+    }
+    
+    // تحديث الواجهة
+    if (typeof refreshAllData === 'function') {
+      refreshAllData();
+    }
+    
     toast('✅ تم تحميل البيانات من GitHub بنجاح!');
   } catch (error) {
     console.error(error);
     toast('❌ خطأ في التحميل: ' + error.message);
   }
 }
-// ===== مزامنة تلقائية كل 5 ثواني =====
+
+// ===== دالة لحفظ البيانات فوراً (للمزامنة التلقائية) =====
+async function forceSync() {
+  await syncToGitHub();
+}
+
+// ===== بدء المزامنة التلقائية =====
 let autoSyncInterval = null;
 let autoSyncEnabled = true;
 
-// ===== تشغيل المزامنة التلقائية =====
 function startAutoSync() {
   if (autoSyncInterval) {
     clearInterval(autoSyncInterval);
@@ -113,67 +143,30 @@ function startAutoSync() {
   
   autoSyncInterval = setInterval(async function() {
     if (!autoSyncEnabled) return;
-    
-    // تحقق من وجود تغييرات (اختياري)
     try {
-      // حفظ البيانات تلقائياً
       await syncToGitHub();
-      console.log('🔄 مزامنة تلقائية:', new Date().toLocaleTimeString());
     } catch (error) {
       console.error('❌ فشل المزامنة التلقائية:', error);
     }
-  }, 5000); // 5000 ميلي ثانية = 5 ثواني
+  }, 5000); // كل 5 ثواني
 }
 
-// ===== إيقاف المزامنة التلقائية =====
 function stopAutoSync() {
   if (autoSyncInterval) {
     clearInterval(autoSyncInterval);
     autoSyncInterval = null;
-    console.log('⏹️ تم إيقاف المزامنة التلقائية');
   }
 }
 
-// ===== تبديل حالة المزامنة التلقائية =====
 function toggleAutoSync() {
   autoSyncEnabled = !autoSyncEnabled;
   const status = autoSyncEnabled ? '🟢 مفعلة' : '🔴 معطلة';
   toast(`المزامنة التلقائية: ${status}`);
-  console.log(`المزامنة التلقائية: ${status}`);
 }
 
 // ===== بدء المزامنة التلقائية عند تحميل الصفحة =====
 document.addEventListener('DOMContentLoaded', function() {
-  // انتظر 10 ثواني قبل بدء المزامنة التلقائية
   setTimeout(function() {
     startAutoSync();
-    console.log('🔄 تم بدء المزامنة التلقائية (كل 5 ثواني)');
   }, 10000);
 });
-// ===== المزامنة الفورية =====
-async function syncNow() {
-  toast('🔄 جاري المزامنة...');
-  await syncToGitHub();
-}
-
-// ===== تبديل إعداد المزامنة التلقائية =====
-function toggleAutoSyncSetting() {
-  const checkbox = document.getElementById('autoSyncCheckbox');
-  if (checkbox) {
-    autoSyncEnabled = checkbox.checked;
-    const statusEl = document.getElementById('autoSyncStatus');
-    if (statusEl) {
-      statusEl.textContent = autoSyncEnabled ? '🟢 مفعلة (كل 5 ثواني)' : '🔴 معطلة';
-      statusEl.style.color = autoSyncEnabled ? '#5fe3a8' : '#ff6b6b';
-    }
-    toast(autoSyncEnabled ? '🟢 تم تفعيل المزامنة التلقائية' : '🔴 تم إيقاف المزامنة التلقائية');
-  }
-}
-
-// ===== حفظ عند كل تغيير (اختياري) =====
-// يمكنك استدعاء هذه الدالة بعد كل عملية حفظ في النظام
-function autoSave() {
-  if (autoSyncEnabled) {
-    syncToGitHub().catch(err => console.error('Auto-save failed:', err));
-  }
-}
