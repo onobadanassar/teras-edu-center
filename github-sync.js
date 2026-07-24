@@ -183,3 +183,4 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('🔄 تم بدء المزامنة التلقائية (كل 5 ثواني)');
   }, 10000);
 });
+console.log(GITHUB_CONFIG);
