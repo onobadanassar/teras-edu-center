@@ -184,3 +184,4 @@ document.addEventListener('DOMContentLoaded', function() {
   }, 10000);
 });
 console.log(GITHUB_CONFIG);
+syncToGitHub();
