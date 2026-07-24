@@ -1929,26 +1929,25 @@
           <button class="btn btn-success" onclick="saveAllSettings()" style="font-size:19px;padding:10px 40px"><i class="fa-solid fa-floppy-disk"></i> حفظ جميع الإعدادات</button>
         </div>
       </div>
-              <!-- ===== قسم مزامنة GitHub ===== -->
-        <div class="settings-section" style="border:2px solid var(--g);margin-top:20px;">
-          <h3 style="color:var(--g);">☁️ المزامنة السحابية مع GitHub</h3>
-          <p style="color:#aaa;font-size:14px;margin-bottom:12px;">
-            احفظ جميع بياناتك (الطلاب، الموظفين، المدفوعات، الجداول، الإعلانات) على GitHub لتبقى محفوظة وتظهر في كل الأجهزة.
-          </p>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn btn-success" onclick="syncToGitHub()" style="font-size:16px;padding:10px 20px;">
-              <i class="fa-solid fa-cloud-upload-alt"></i> 💾 حفظ في GitHub
-            </button>
-            <button class="btn btn-primary" onclick="loadFromGitHub()" style="font-size:16px;padding:10px 20px;">
-              <i class="fa-solid fa-cloud-download-alt"></i> 📥 تحميل من GitHub
-            </button>
-          </div>
-          <div id="githubStatus" style="margin-top:10px;color:#888;font-size:14px;">
-            ⚡ اضغط "حفظ" لرفع كل البيانات إلى السحابة، و"تحميل" لاستعادتها في أي جهاز
-          </div>
-        </div>
-        <!-- ===== نهاية قسم المزامنة ===== -->
-
+<!-- ===== قسم مزامنة GitHub ===== -->
+<div class="settings-section" style="border:2px solid var(--g);margin-top:20px;">
+  <h3 style="color:var(--g);">☁️ المزامنة السحابية مع GitHub</h3>
+  <p style="color:#aaa;font-size:14px;margin-bottom:12px;">
+    احفظ جميع بياناتك (الطلاب، الموظفين، المدفوعات، الجداول، الإعلانات) على GitHub لتبقى محفوظة وتظهر في كل الأجهزة.
+  </p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <button class="btn btn-success" onclick="syncToGitHub()" style="font-size:16px;padding:10px 20px;">
+      <i class="fa-solid fa-cloud-upload-alt"></i> 💾 حفظ في GitHub
+    </button>
+    <button class="btn btn-primary" onclick="loadFromGitHub()" style="font-size:16px;padding:10px 20px;">
+      <i class="fa-solid fa-cloud-download-alt"></i> 📥 تحميل من GitHub
+    </button>
+  </div>
+  <div id="githubStatus" style="margin-top:10px;color:#888;font-size:14px;">
+    ⚡ اضغط "حفظ" لرفع كل البيانات إلى السحابة، و"تحميل" لاستعادتها في أي جهاز
+  </div>
+</div>
+<!-- ===== نهاية قسم المزامنة ===== -->
         <!-- ===== زر حفظ جميع الإعدادات ===== -->
         <div style="margin-top:20px;text-align:center;border-top:1px solid var(--border);padding-top:15px">
           <button class="btn btn-success" onclick="saveAllSettings()" style="font-size:19px;padding:10px 40px">
