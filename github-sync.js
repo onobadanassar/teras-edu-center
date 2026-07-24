@@ -1,10 +1,5 @@
-// ===== github-sync.js =====
-// دوال المزامنة مع GitHub
-
-// ===== حفظ البيانات إلى GitHub =====
 async function syncToGitHub() {
   try {
-    // جمع كل البيانات
     const data = {
       employees: db.employees || [],
       students: db.students || [],
@@ -23,7 +18,6 @@ async function syncToGitHub() {
     
     const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.file}`;
     
-    // التحقق من وجود الملف
     let sha = '';
     const getResponse = await fetch(url, {
       headers: {
@@ -37,10 +31,8 @@ async function syncToGitHub() {
       sha = existing.sha;
     }
     
-    // تشفير البيانات
     const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
     
-    // حفظ البيانات
     const response = await fetch(url, {
       method: 'PUT',
       headers: {
@@ -58,8 +50,7 @@ async function syncToGitHub() {
     if (response.ok) {
       toast('✅ تم حفظ البيانات في GitHub');
     } else {
-      const error = await response.json();
-      toast('❌ فشل الحفظ: ' + (error.message || 'خطأ غير معروف'));
+      toast('❌ فشل الحفظ');
     }
   } catch (error) {
     console.error(error);
@@ -67,7 +58,6 @@ async function syncToGitHub() {
   }
 }
 
-// ===== تحميل البيانات من GitHub =====
 async function loadFromGitHub() {
   try {
     const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.file}`;
@@ -80,7 +70,7 @@ async function loadFromGitHub() {
     
     if (!response.ok) {
       if (response.status === 404) {
-        toast('⚠️ لا يوجد ملف بيانات في GitHub. احفظ البيانات أولاً!');
+        toast('⚠️ لا يوجد ملف بيانات في GitHub');
         return;
       }
       throw new Error('فشل التحميل');
@@ -89,7 +79,6 @@ async function loadFromGitHub() {
     const data = await response.json();
     const content = JSON.parse(atob(data.content));
     
-    // استعادة البيانات
     db.employees = content.employees || [];
     db.students = content.students || [];
     db.payments = content.payments || [];
