@@ -1,0 +1,15 @@
+{
+  "employees": [],
+  "students": [],
+  "payments": [],
+  "materials": [],
+  "expenses": [],
+  "receipts": [],
+  "rooms": [],
+  "courses": [],
+  "schedule": {},
+  "masterSchedule": [],
+  "announcements": [],
+  "pricePlans": [],
+  "settings": {}
+}
