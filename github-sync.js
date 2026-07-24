@@ -101,3 +101,52 @@ async function loadFromGitHub() {
     toast('❌ خطأ في التحميل: ' + error.message);
   }
 }
+// ===== مزامنة تلقائية كل 5 ثواني =====
+let autoSyncInterval = null;
+let autoSyncEnabled = true;
+
+// ===== تشغيل المزامنة التلقائية =====
+function startAutoSync() {
+  if (autoSyncInterval) {
+    clearInterval(autoSyncInterval);
+  }
+  
+  autoSyncInterval = setInterval(async function() {
+    if (!autoSyncEnabled) return;
+    
+    // تحقق من وجود تغييرات (اختياري)
+    try {
+      // حفظ البيانات تلقائياً
+      await syncToGitHub();
+      console.log('🔄 مزامنة تلقائية:', new Date().toLocaleTimeString());
+    } catch (error) {
+      console.error('❌ فشل المزامنة التلقائية:', error);
+    }
+  }, 5000); // 5000 ميلي ثانية = 5 ثواني
+}
+
+// ===== إيقاف المزامنة التلقائية =====
+function stopAutoSync() {
+  if (autoSyncInterval) {
+    clearInterval(autoSyncInterval);
+    autoSyncInterval = null;
+    console.log('⏹️ تم إيقاف المزامنة التلقائية');
+  }
+}
+
+// ===== تبديل حالة المزامنة التلقائية =====
+function toggleAutoSync() {
+  autoSyncEnabled = !autoSyncEnabled;
+  const status = autoSyncEnabled ? '🟢 مفعلة' : '🔴 معطلة';
+  toast(`المزامنة التلقائية: ${status}`);
+  console.log(`المزامنة التلقائية: ${status}`);
+}
+
+// ===== بدء المزامنة التلقائية عند تحميل الصفحة =====
+document.addEventListener('DOMContentLoaded', function() {
+  // انتظر 10 ثواني قبل بدء المزامنة التلقائية
+  setTimeout(function() {
+    startAutoSync();
+    console.log('🔄 تم بدء المزامنة التلقائية (كل 5 ثواني)');
+  }, 10000);
+});
