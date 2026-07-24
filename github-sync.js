@@ -150,3 +150,30 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('🔄 تم بدء المزامنة التلقائية (كل 5 ثواني)');
   }, 10000);
 });
+// ===== المزامنة الفورية =====
+async function syncNow() {
+  toast('🔄 جاري المزامنة...');
+  await syncToGitHub();
+}
+
+// ===== تبديل إعداد المزامنة التلقائية =====
+function toggleAutoSyncSetting() {
+  const checkbox = document.getElementById('autoSyncCheckbox');
+  if (checkbox) {
+    autoSyncEnabled = checkbox.checked;
+    const statusEl = document.getElementById('autoSyncStatus');
+    if (statusEl) {
+      statusEl.textContent = autoSyncEnabled ? '🟢 مفعلة (كل 5 ثواني)' : '🔴 معطلة';
+      statusEl.style.color = autoSyncEnabled ? '#5fe3a8' : '#ff6b6b';
+    }
+    toast(autoSyncEnabled ? '🟢 تم تفعيل المزامنة التلقائية' : '🔴 تم إيقاف المزامنة التلقائية');
+  }
+}
+
+// ===== حفظ عند كل تغيير (اختياري) =====
+// يمكنك استدعاء هذه الدالة بعد كل عملية حفظ في النظام
+function autoSave() {
+  if (autoSyncEnabled) {
+    syncToGitHub().catch(err => console.error('Auto-save failed:', err));
+  }
+}
